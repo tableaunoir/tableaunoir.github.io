@@ -99,7 +99,7 @@ var User = /** @class */ (function () {
         this.eraseModeBig = false;
         if (this.canWrite) {
             if (this.eraseMode) {
-                clearLine(this.x, this.y, this.x, this.y, ERASEMODEDEFAULTSIZE);
+                Drawing.clearLine(this.x, this.y, this.x, this.y, ERASEMODEDEFAULTSIZE);
             }
             else {
                 this.lastDelineation.reset();
@@ -131,11 +131,11 @@ var User = /** @class */ (function () {
                     if (this.isCurrentUser()) {
                         this.setToolCursorImage(EraserCursor.getStyleCursor(this.eraseLineWidth));
                     }
-                    clearLine(this.x, this.y, evtX, evtY, this.eraseLineWidth);
+                    Drawing.clearLine(this.x, this.y, evtX, evtY, this.eraseLineWidth);
                 }
                 else {
                     if (this.lastDelineation.isDrawing()) { //this guard is because, when a magnet is created the user does not know the drawing stopped.
-                        drawLine(getCanvas().getContext("2d"), this.x, this.y, evtX, evtY, evt.pressure, this.color);
+                        Drawing.drawLine(getCanvas().getContext("2d"), this.x, this.y, evtX, evtY, evt.pressure, this.color);
                         this.lastDelineation.addPoint({ x: evtX, y: evtY });
                     }
                 }
@@ -160,7 +160,7 @@ var User = /** @class */ (function () {
             this.lastDelineation.finish();
             //console.log("mouseup")
             if (this.isDrawing && !this.eraseMode && !this.alreadyDrawnSth) {
-                drawDot(this.x, this.y, this.color);
+                Drawing.drawDot(this.x, this.y, this.color);
             }
             if (this.isCurrentUser()) {
                 if (this.eraseMode) { //restore the eraser to the original size {

@@ -34,7 +34,7 @@ var Background = /** @class */ (function () {
             var space = fullHeight / 30;
             for (var i = -2; i <= 2; i++) {
                 var y = ymiddle + i * space;
-                drawLine(canvasBackground.getContext("2d"), x, y, x2, y, 1.0, COLORSTAFF);
+                Drawing.drawLine(canvasBackground.getContext("2d"), x, y, x2, y, 1.0, COLORSTAFF);
             }
         };
         drawStaff(ymiddleScreen - yshift);

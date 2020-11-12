@@ -52,6 +52,15 @@ var ShareEvent = /** @class */ (function () {
     ShareEvent.questionRemove = function (questionID) {
         Discussion.removeQuestion(questionID);
     };
+    ShareEvent.removeContour = function (points) {
+        Drawing.removeContour(points);
+    };
+    ShareEvent.clearPolygon = function (points) {
+        Drawing.clearPolygon(points);
+    };
+    ShareEvent.printMagnet = function (magnetID) {
+        MagnetManager.printMagnet(document.getElementById(magnetID));
+    };
     return ShareEvent;
 }());
 //# sourceMappingURL=ShareEvent.js.map

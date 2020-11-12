@@ -64,6 +64,7 @@ var LoadSave = /** @class */ (function () {
                     MagnetManager.addMagnet(img);
                 };
             }
+            Menu.hide(); //hide the menu after loading
         }
     };
     /**

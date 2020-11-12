@@ -7,20 +7,6 @@ var Delineation = /** @class */ (function () {
         this.points = [];
         this.lastpoints = [];
         this.maybeJustAPoint = true; //memoisation for getDot
-        this._removeContour = function () {
-            var canvas = getCanvas();
-            var context = canvas.getContext("2d");
-            context.globalCompositeOperation = "destination-out";
-            context.strokeStyle = "rgba(255, 255, 255, 1)";
-            context.lineWidth = 6;
-            context.globalAlpha = 1.0;
-            context.moveTo(_this.points[0].x, _this.points[0].y);
-            for (var _i = 0, _a = _this.points; _i < _a.length; _i++) {
-                var point = _a[_i];
-                context.lineTo(point.x, point.y);
-            }
-            context.stroke();
-        };
         this._createMagnetFromImg = function () {
             var img = new Image();
             var rectangle = _this._getRectangle();
@@ -31,21 +17,6 @@ var Delineation = /** @class */ (function () {
             MagnetManager.addMagnet(img);
             img.style.left = rectangle.x1 + "px";
             img.style.top = rectangle.y1 + "px";
-        };
-        this._clearBehindMagnet = function () {
-            var context = getCanvas().getContext("2d");
-            context.save();
-            context.beginPath();
-            context.moveTo(_this.points[0].x, _this.points[0].y);
-            for (var _i = 0, _a = _this.points; _i < _a.length; _i++) {
-                var point = _a[_i];
-                context.lineTo(point.x, point.y);
-            }
-            context.clip();
-            context.clearRect(0, 0, Layout.getWindowWidth(), Layout.getWindowHeight());
-            context.restore();
-            context.globalCompositeOperation = "source-over";
-            _this.reset();
         };
     }
     Delineation.prototype.reset = function () {
@@ -88,7 +59,7 @@ var Delineation = /** @class */ (function () {
             window.setTimeout(function () {
                 if (_this.drawing && _this.isDot() && _this.dotInPreviousPolygon()) {
                     _this.removePolygon();
-                    _this._removeContour(); //remove the dot
+                    Share.execute("removeContour", [_this.points]); //remove the dot
                     _this.points = _this.lastpoints;
                     _this.lastpoints = [];
                     _this.cutAndMagnetize();
@@ -142,8 +113,9 @@ var Delineation = /** @class */ (function () {
     Delineation.prototype.erase = function () {
         if (!this.isSuitable())
             return;
-        this._removeContour();
-        this._clearBehindMagnet();
+        Share.execute("removeContour", [this.points]);
+        Share.execute("clearPolygon", [this.points]);
+        this.reset();
         BoardManager.save();
     };
     /**
@@ -152,9 +124,10 @@ var Delineation = /** @class */ (function () {
     Delineation.prototype.cutAndMagnetize = function () {
         if (!this.isSuitable())
             return;
-        this._removeContour();
+        Share.execute("removeContour", [this.points]);
         this._createMagnetFromImg();
-        this._clearBehindMagnet();
+        Share.execute("clearPolygon", [this.points]);
+        this.reset();
         BoardManager.save();
     };
     /**
@@ -163,7 +136,7 @@ var Delineation = /** @class */ (function () {
     Delineation.prototype.copyAndMagnetize = function () {
         if (!this.isSuitable())
             return;
-        this._removeContour();
+        Share.execute("removeContour", [this.points]);
         this._createMagnetFromImg();
         BoardManager.save();
     };

@@ -15,6 +15,9 @@ var MagnetManager = /** @class */ (function () {
     MagnetManager.getMagnetUnderCursor = function () {
         return MagnetManager.magnetUnderCursor;
     };
+    MagnetManager.getCurrentMagnetID = function () {
+        return MagnetManager.currentMagnet.id;
+    };
     /**
      *
      * @param {boolean} b
@@ -201,7 +204,7 @@ var MagnetManager = /** @class */ (function () {
             for (var j = 0; j < nodes.length; j++) {
                 if (Math.abs(nodes[i].x - nodes[j].x) + Math.abs(nodes[i].y - nodes[j].y) < 400 && !isCrossing(i, j)) {
                     edges[i][j] = 1;
-                    drawLine(context, nodes[i].x, nodes[i].y, nodes[j].x, nodes[j].y);
+                    Drawing.drawLine(context, nodes[i].x, nodes[i].y, nodes[j].x, nodes[j].y);
                 }
             }
         BoardManager.save();
@@ -409,10 +412,10 @@ var MagnetManager = /** @class */ (function () {
         MagnetManager.magnetUnderCursor = undefined;
     };
     /**
+     * @param img
      * @description draw the current magnet to the canvas
      */
-    MagnetManager.printCurrentMagnet = function () {
-        var img = MagnetManager.currentMagnet;
+    MagnetManager.printMagnet = function (img) {
         if (!(img instanceof Image)) {
             console.log("the current image is not an image! Could not be printed!");
             return;

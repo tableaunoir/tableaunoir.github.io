@@ -15,6 +15,21 @@ var MagnetManager = /** @class */ (function () {
     MagnetManager.getMagnetUnderCursor = function () {
         return MagnetManager.magnetUnderCursor;
     };
+    /**
+     * @returns true iff there is a current magnet
+     */
+    MagnetManager.hasCurrentMagnet = function () {
+        return MagnetManager.currentMagnet == undefined;
+    };
+    /**
+     * @description set that there is no current magnet
+     */
+    MagnetManager.noCurrentMagnet = function () {
+        MagnetManager.currentMagnet = undefined;
+    };
+    /**
+     * @returns the ID of the current magnet
+     */
     MagnetManager.getCurrentMagnetID = function () {
         return MagnetManager.currentMagnet.id;
     };
@@ -221,12 +236,9 @@ var MagnetManager = /** @class */ (function () {
     /**
      *
      * @param element
-     * @description adds the event mousedown etc. to the magnet. Call LaTEX
+     * @description set the z-index of the element depending on the size of the element
      */
-    MagnetManager._installMagnet = function (element) {
-        if (element.classList.contains("magnetText"))
-            MagnetManager.installMagnetText(element);
-        makeDraggableElement(element);
+    MagnetManager.setZIndex = function (element) {
         var f = function () { var LARGENUMBER = 10000; element.style.zIndex = LARGENUMBER - element.clientWidth; };
         if (element.tagName == "IMG") {
             element.addEventListener("load", f);
@@ -234,82 +246,111 @@ var MagnetManager = /** @class */ (function () {
         else {
             f();
         }
-        element.onmouseenter = function () { MagnetManager.magnetUnderCursor = element; };
-        element.onmouseleave = function () { MagnetManager.magnetUnderCursor = undefined; };
-        function makeDraggableElement(element) {
-            var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            element.addEventListener("pointerdown", dragMouseDown);
-            TouchScreen.addTouchEvents(element);
-            var otherElementsToMove = [];
-            var canvasCursorStore = undefined;
-            var drag = true;
-            function dragMouseDown(e) {
-                drag = true;
-                MagnetManager.currentMagnet = e.target;
-                /**
-                 *
-                 * @param {*} el
-                 * @param {*} bigel
-                 * @returns true if el is inside bigel
-                 */
-                function inside(el, bigel) {
-                    return el.offsetLeft > bigel.offsetLeft && el.offsetTop > bigel.offsetTop &&
-                        el.offsetLeft + el.clientWidth < bigel.offsetLeft + bigel.clientWidth &&
-                        el.offsetTop + el.clientHeight < bigel.offsetTop + bigel.clientHeight;
-                }
-                var canvas = getCanvas();
-                canvasCursorStore = canvas.style.cursor;
-                e = e || window.event;
-                e.preventDefault(); //to avoid the drag/drop by the browser
-                // get the mouse cursor position at startup:
-                pos3 = e.clientX * Layout.getZoom();
-                pos4 = e.clientY * Layout.getZoom();
-                document.onpointerup = closeDragElement;
-                document.onmouseup = closeDragElement;
-                // call a function whenever the cursor moves:
-                document.onpointermove = elementDrag;
-                var magnets = MagnetManager.getMagnets();
-                otherElementsToMove = [];
-                //if(elmt.style.clipPath == undefined) //if not an image (otherwise bug)
-                for (var i = 0; i < magnets.length; i++)
-                    if (magnets[i] != element && inside(magnets[i], element)) {
-                        otherElementsToMove.push(magnets[i]);
-                    }
+    };
+    /**
+     *
+     * @param element
+     * @returns a copy of the element, ready to be given to addMagnet
+     */
+    MagnetManager.createCopyMagnet = function (element) {
+        return element.cloneNode(true);
+    };
+    /**
+     *
+     * @param element
+     * @description makes that the magnet is draggable
+     */
+    MagnetManager.makeDraggableElement = function (element) {
+        var dx = 0, dy = 0, x = 0, y = 0;
+        element.addEventListener("pointerdown", dragMouseDown);
+        TouchScreen.addTouchEvents(element);
+        var otherElementsToMove = [];
+        var canvasCursorStore = undefined;
+        var drag = true;
+        function dragMouseDown(evt) {
+            drag = true;
+            MagnetManager.currentMagnet = evt.target;
+            if (evt.ctrlKey) {
+                /**makes a copy. The copy does not move. */
+                var copy = MagnetManager.createCopyMagnet(element);
+                MagnetManager.addMagnet(copy);
+                Share.execute("magnetMove", [copy.id, element.style.left, element.style.top]);
             }
-            function elementDrag(e) {
-                if (!drag)
-                    return;
-                MagnetManager.currentMagnet = e.target;
-                e.target.classList.add("magnetDrag");
-                var canvas = getCanvas();
-                canvas.style.cursor = "none";
-                e = e || window.event;
-                e.preventDefault();
-                // calculate the new cursor position:
-                pos1 = pos3 - e.clientX * Layout.getZoom();
-                pos2 = pos4 - e.clientY * Layout.getZoom();
-                pos3 = e.clientX * Layout.getZoom();
-                pos4 = e.clientY * Layout.getZoom();
-                // set the element's new position:
-                Share.execute("magnetMove", [element.id, element.offsetLeft - pos1, element.offsetTop - pos2]);
-                for (var _i = 0, otherElementsToMove_1 = otherElementsToMove; _i < otherElementsToMove_1.length; _i++) {
-                    var el = otherElementsToMove_1[_i];
-                    Share.execute("magnetMove", [el.id, el.offsetLeft - pos1, el.offsetTop - pos2]);
-                }
+            /**
+             *
+             * @param {*} element
+             * @param {*} bigElement
+             * @returns true if element is inside bigElement
+             */
+            function inside(element, bigElement) {
+                return element.offsetLeft > bigElement.offsetLeft && element.offsetTop > bigElement.offsetTop &&
+                    element.offsetLeft + element.clientWidth < bigElement.offsetLeft + bigElement.clientWidth &&
+                    element.offsetTop + element.clientHeight < bigElement.offsetTop + bigElement.clientHeight;
             }
-            function closeDragElement(e) {
-                if (!drag)
-                    return;
-                drag = false;
-                console.log("close drag");
-                if (e.target.classList != undefined) //it is undefined = dropped outside the screen. TODO: delete the magnets?
-                    e.target.classList.remove("magnetDrag");
-                getCanvas().style.cursor = canvasCursorStore;
-                // stop moving when mouse button is released:
-                document.onmouseup = null;
-                document.onmousemove = null;
+            var canvas = getCanvas();
+            canvasCursorStore = canvas.style.cursor;
+            evt = evt || window.event;
+            evt.preventDefault(); //to avoid the drag/drop by the browser
+            // get the mouse cursor position at startup:
+            x = evt.clientX * Layout.getZoom();
+            y = evt.clientY * Layout.getZoom();
+            document.onpointerup = closeDragElement;
+            document.onmouseup = closeDragElement;
+            document.onpointermove = elementDrag;
+            var magnets = MagnetManager.getMagnets();
+            otherElementsToMove = [];
+            //if(elmt.style.clipPath == undefined) //if not an image (otherwise bug)
+            for (var i = 0; i < magnets.length; i++)
+                if (magnets[i] != element && inside(magnets[i], element)) {
+                    otherElementsToMove.push(magnets[i]);
+                }
+        }
+        function elementDrag(e) {
+            if (!drag)
+                return;
+            MagnetManager.currentMagnet = e.target;
+            e.target.classList.add("magnetDrag");
+            var canvas = getCanvas();
+            canvas.style.cursor = "none";
+            e = e || window.event;
+            e.preventDefault();
+            // calculate the new cursor position:
+            dx = x - e.clientX * Layout.getZoom();
+            dy = y - e.clientY * Layout.getZoom();
+            x = e.clientX * Layout.getZoom();
+            y = e.clientY * Layout.getZoom();
+            // set the element's new position:
+            Share.execute("magnetMove", [element.id, element.offsetLeft - dx, element.offsetTop - dy]);
+            for (var _i = 0, otherElementsToMove_1 = otherElementsToMove; _i < otherElementsToMove_1.length; _i++) {
+                var el = otherElementsToMove_1[_i];
+                Share.execute("magnetMove", [el.id, el.offsetLeft - dx, el.offsetTop - dy]);
             }
         }
+        function closeDragElement(e) {
+            if (!drag)
+                return;
+            drag = false;
+            console.log("close drag");
+            if (e.target.classList != undefined) //it is undefined = dropped outside the screen. TODO: delete the magnets?
+                e.target.classList.remove("magnetDrag");
+            getCanvas().style.cursor = canvasCursorStore;
+            // stop moving when mouse button is released:
+            document.onmouseup = null;
+            document.onmousemove = null;
+        }
+    };
+    /**
+     *
+     * @param element
+     * @description adds the event mousedown etc. to the magnet. Call LaTEX
+     */
+    MagnetManager._installMagnet = function (element) {
+        if (element.classList.contains("magnetText"))
+            MagnetManager.installMagnetText(element);
+        MagnetManager.makeDraggableElement(element);
+        MagnetManager.setZIndex(element);
+        element.onmouseenter = function () { MagnetManager.magnetUnderCursor = element; };
+        element.onmouseleave = function () { MagnetManager.magnetUnderCursor = undefined; };
     };
     /**
      *

@@ -28,6 +28,8 @@ var ShareEvent = /** @class */ (function () {
         UserManager.users[userId].setCanWrite(bool);
     };
     ShareEvent.magnetMove = function (idMagnet, x, y) {
+        x = parseInt(x);
+        y = parseInt(y);
         var el = document.getElementById(idMagnet);
         el.style.top = y + "px";
         el.style.left = x + "px";

@@ -1,0 +1,1 @@
+//!Share.isShared();//(!Share.isShared() && !Layout.isTactileDevice());

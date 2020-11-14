@@ -32,6 +32,7 @@ const WebSocket = require('ws'); //websocket library
 const fs = require('fs'); //filesystem
 const uuid = require('small-uuid'); //for generating small IDs
 
+console.log("WELCOME TO TABLEAUNOIR!");
 
 
 class ServerCreation {

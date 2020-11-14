@@ -217,6 +217,7 @@ class TableauNoir {
  * Create a web socket server at a Unix socket.
  */
 function createWebSocketServerUnix(path) {
+  console.log("unix server");
   const httpServer = http.createServer();
   const wsServer = new WebSocket.Server({ server: httpServer });
 
@@ -238,6 +239,7 @@ function createWebSocketServerUnix(path) {
  * Create a simple web socket server at an internet domain socket.
  */
 function createWebSocketServerInet(addr, port) {
+  console.log("Inet server");
   const httpServer = http.createServer();
   const wsServer = new WebSocket.Server({ server: httpServer });
   httpServer.listen(port, addr);
@@ -248,6 +250,7 @@ function createWebSocketServerInet(addr, port) {
 
 
 function createWebSocketServerNormal(port) {
+  console.log(`normal server on port ${port}`);
   return new WebSocket.Server({
     port: port
   });

@@ -84,7 +84,7 @@ function createWebSocketServerNormal(port) {
  * Create a simple web socket at the address specified in SOCKET_ADDR.
  */
 function createWebSocketServer(SOCKET_ADDR) {
-  console.log("creation of the socket server")
+  console.log("creation of the socket server...")
   if (SOCKET_ADDR.hasOwnProperty('addr') && SOCKET_ADDR.hasOwnProperty('port')) {
     return createWebSocketServerInet(SOCKET_ADDR.addr, SOCKET_ADDR.port);
   }
@@ -94,6 +94,7 @@ function createWebSocketServer(SOCKET_ADDR) {
   else if (SOCKET_ADDR.hasOwnProperty('unix')) {
     return createWebSocketServerUnix(SOCKET_ADDR.unix);
   }
+  console.log("Invalid SOCKET_ADDR");
   throw 'Invalid SOCKET_ADDR';
 }
 

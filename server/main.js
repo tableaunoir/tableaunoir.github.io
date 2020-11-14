@@ -1,17 +1,119 @@
 'use strict';
 
+/**********************************************************************************
+ * Different possibilities for creating the socket
+ */
+
+//For a normal server listening on a given port:
+
+const SOCKET_ADDR = { port: 8080 };
+
+
 // For the server to listen on a regular internet domain socket, set SOCKET_ADDR
 // to a record of the form { addr: addr, port: port }, for instance:
-const SOCKET_ADDR = { addr: 'localhost', port: 8080 };
+
+//const SOCKET_ADDR = { addr: 'localhost', port: 8080 };
+
+
+
+
+
 // If you prefer Unix domain sockets, set SOCKET_ADDR to a record containing the
 // path of the socket, for instance:
+
 // const SOCKET_ADDR = { unix: '/run/tableaunoir.sock' };
 
-const http = require('http');
 
+/********************************************************************************* */
+
+
+const http = require('http');
 const WebSocket = require('ws'); //websocket library
 const fs = require('fs'); //filesystem
 const uuid = require('small-uuid'); //for generating small IDs
+
+console.log("WELCOME TO TABLEAUNOIR!");
+
+
+class ServerCreation {
+  /**
+   * Create a web socket server at a Unix socket.
+   */
+  static _createWebSocketServerUnix(path) {
+    console.log("unix server");
+    const httpServer = http.createServer();
+    const wsServer = new WebSocket.Server({ server: httpServer });
+
+    // The socket must be world readable and world writable.
+    httpServer.listen(path, () => {
+      fs.chmod(path, 0o777, (err) => { if (err) throw err; });
+    });
+
+    // Remove the socket before exiting.
+    process.on('SIGINT', () => {
+      fs.unlink(path, (err) => { if (err) throw err; });
+      process.exit();
+    });
+
+    return wsServer;
+  }
+
+  /**
+   * Create a simple web socket server at an internet domain socket.
+   */
+  static _createWebSocketServerInet(addr, port) {
+    console.log("Inet server");
+    const httpServer = http.createServer();
+    const wsServer = new WebSocket.Server({ server: httpServer });
+    httpServer.listen(port, addr);
+    return wsServer;
+  }
+
+
+
+
+  static _createWebSocketServerNormal(port) {
+    console.log(`normal server on port ${port}`);
+    return new WebSocket.Server({
+      port: port
+    });
+  }
+
+
+
+  /**
+   * Create a simple web socket at the address specified in SOCKET_ADDR.
+   */
+  static createWebSocketServer(SOCKET_ADDR) {
+    console.log("creation of the socket server...");
+    if (SOCKET_ADDR.hasOwnProperty('addr') && SOCKET_ADDR.hasOwnProperty('port'))
+      return ServerCreation._createWebSocketServerInet(SOCKET_ADDR.addr, SOCKET_ADDR.port);
+    else if (SOCKET_ADDR.hasOwnProperty('port'))
+      return ServerCreation._createWebSocketServerNormal(SOCKET_ADDR.port)
+    else if (SOCKET_ADDR.hasOwnProperty('unix'))
+      return ServerCreation._createWebSocketServerUnix(SOCKET_ADDR.unix);
+
+    console.log("Invalid SOCKET_ADDR");
+    throw 'Invalid SOCKET_ADDR';
+  }
+
+
+}
+
+const server = ServerCreation.createWebSocketServer(SOCKET_ADDR);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class UserManager {
   /**
@@ -61,6 +163,9 @@ function print(str) {
   }
 
 }
+
+
+print("Tableaunoir server is ready -- Welcome");
 
 
 
@@ -166,7 +271,7 @@ class TableauNoir {
     this.sockets.forEach(s => {
       if (s.userid == msg.to) {
         s.send(JSON.stringify(msg))
-        print( messageToString(msg) + "  > " + s.userid);
+        print(messageToString(msg) + "  > " + s.userid);
       }
     });
 
@@ -195,55 +300,10 @@ class TableauNoir {
   }
 }
 
-/**
- * Create a web socket server at a Unix socket.
- */
-function createWebSocketServerUnix(path) {
-  const httpServer = http.createServer();
-  const wsServer = new WebSocket.Server({ server: httpServer });
-
-  // The socket must be world readable and world writable.
-  httpServer.listen(path, () => {
-    fs.chmod(path, 0o777, (err) => { if (err) throw err; });
-  });
-
-  // Remove the socket before exiting.
-  process.on('SIGINT', () => {
-    fs.unlink(path, (err) => { if (err) throw err; });
-    process.exit();
-  });
-
-  return wsServer;
-}
-
-/**
- * Create a simple web socket server at an internet domain socket.
- */
-function createWebSocketServerInet(addr, port) {
-  const httpServer = http.createServer();
-  const wsServer = new WebSocket.Server({ server: httpServer });
-  httpServer.listen(port, addr);
-  return wsServer;
-}
-
-/**
- * Create a simple web socket at the address specified in SOCKET_ADDR.
- */
-function createWebSocketServer() {
-  if (SOCKET_ADDR.hasOwnProperty('addr') && SOCKET_ADDR.hasOwnProperty('port')) {
-    return createWebSocketServerInet(SOCKET_ADDR.addr, SOCKET_ADDR.port);
-  }
-  if (SOCKET_ADDR.hasOwnProperty('unix')) {
-    return createWebSocketServerUnix(SOCKET_ADDR.unix);
-  }
-  throw 'Invalid SOCKET_ADDR';
-}
-
-const server = createWebSocketServer();
 
 let sockets = [];
 
-print("Tableaunoir server -- Welcome");
+
 
 server.on('connection', function (socket) {
   print("New connection!")
@@ -282,7 +342,7 @@ function treatReceivedMessageFromClient(msg) {
       tableaunoirs[tableaunoirID].addSocket(msg.socket);
       tableaunoirs[tableaunoirID].setRoot(msg.socket);
       tableaunoirs[tableaunoirID].setPassWord(msg.password);
-      
+
       tableaunoirs[tableaunoirID].sendTo({ type: "id", id: tableaunoirID, to: msg.socket.userid });
       //msg.socket.send(JSON.stringify({ type: "id", id: tableaunoirID }));
       break;

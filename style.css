@@ -691,3 +691,10 @@ h1 {
 	width: 2px;
 	animation: divideLineHelp 2000ms infinite;
 }
+
+.userNameCursor {
+	font-size: 16px;
+	position: absolute;
+	pointer-events: none;
+	color: grey;
+}

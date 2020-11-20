@@ -36,16 +36,13 @@
 			<button id="buttonRight" title="Go right"><img class="icon" src="img/icons/25B6.svg" /></button>
 			<span class="keyboardkeyhelp">← →</span>
 		</div>
-		<button hidden id="buttonAskQuestion" title="Ask a question because you do not understand the course">
-			<img class="icon" src="img/icons/say.svg" /></button>
-
 
 		<button id="buttonShare" title="share and copy link to clipboard if possible"><img class="icon"
 				src="img/icons/E253.svg" /></button>
 		<button id="buttonCloseControls" title="Hide this toolbar (it can be shown again in the menu)"
 			onclick="controls.hidden = true; welcome.hidden = true;"><img class="icon" src="img/icons/hidetoolbar.svg" /></button><span
 			class="keyboardkeyhelp">h</span>
-		<div id="users"></div>
+		<div id="numberOfUsers"></div>
 	</div>
 	
 	<div id="content">
@@ -122,7 +119,7 @@
 			</div>
 
 			<div id="MyBlackboard" class="tabcontent">
-				<h2>Cleaning</h2>
+				<h2>Clear</h2>
 				<div class="menuDiv">
 					<button class="buttonClear" id="blackboardClear">
 						<img src="img/clearboard.png" /><br />clear the board</button>
@@ -132,7 +129,7 @@
 
 				<h2>Load</h2>
 				<div class="menuDiv">
-					<img class="illustration" height="128px" src="img/illustrations/loading.png" />
+					<img align="right" class="illustration" height="128px" src="img/illustrations/loading.png" />
 					<div class="menuDiv">
 						<label for="file">
 							To open an existing board, drag and drop your <em>.tableaunoir file</em> in the application
@@ -144,22 +141,17 @@
 
 				</div>
 				<h2>Save</h2>
-				<img class="illustration" height="128px" src="img/illustrations/saving.png" />
+				<img align="right" class="illustration" height="128px" src="img/illustrations/saving.png" />
 				<div>
 					You may save your board in a <em>.tableaunoir file</em> for using it later:</div>
 				<div class="menuDiv">
 					Name: <input id="name" value="myblackboard" /><button id="save">Save</button>
 				</div>
 
-				<div hidden>
+				<div>
 					<h2>Export</h2>
-					You may export your board as an <em>image .png file</em> for showing it with other people.
-					<div class="warning">
-						You can take a "screenshot" of the current view of the board. You will not be able to import
-						that
-						file again. All magnets will be "flatten" in the resulting
-						image.
-					</div>
+					<div>You may export your board as an <em>image .png file</em> for showing it with other people. All magnets will be "flatten" in the resulting
+					image.</div>
 					<div class="menuDiv">
 						Name: <input id="exportPngName" value="myblackboard" /><button id="exportPng">Get an image
 							of
@@ -192,11 +184,13 @@
 					blackboard</button>
 				<button id="whiteBoardSwitch"><img src="img/switchblackwhite.png" /><br />Switch to
 					whiteboard</button>
-				<button id="controlsToggle" onclick="controls.hidden = !controls.hidden; Menu.hide()">
-					<img src="img/showbuttons.png" /><br />Show/hide toolbar</button>
+				
+				<h2>Interface</h2>
+				<input type="checkbox" id="inputToolbar">Show the toolbar (h)</input>
 				<h2>Cursor</h2>
-				<button id="buttonLefthanded">Left-handed</button>
-				<button id="buttonRighthanded">Right-handed</button>
+				<input type="checkbox" id="inputLeftHanded">Left-handed</input>
+				<input hidden type="checkbox" id="inputHorizontalScrollbar">Show a horizontal scrollbar</input>
+				
 
 			</div>
 
@@ -204,8 +198,6 @@
 				<h2>Blackboard keyboard shortcuts</h2>
 
 				<div class="menuDiv">
-
-
 					<table>
 						<tr>
 							<td><span class="keyboardkey">Esc.</span> or <span class="keyboardkey">F1</span></td>
@@ -235,7 +227,12 @@
 						<tr>
 							<td><span class="keyboardkey">←</span> <span class="keyboardkey">→</span>
 							</td>
-							<td><em>move</em> in the board</td>
+							<td><em>move</em> in the board half-page by half-page</td>
+						</tr>
+						<tr>
+							<td><span class="keyboardkey">Shift+←</span> <span class="keyboardkey">Shift+→</span>
+							</td>
+							<td><em>move</em> slowly in the board</td>
 						</tr>
 					</table>
 
@@ -290,11 +287,12 @@
 				</div>
 			</div>
 			<div id="Share" class="tabcontent">
+				<div>
+					Pseudo: <input id="inputUserName"></input>
+				</div>
 				<div class="warning" id="ShareGithub">Warning: tableaunoir.github.io is
 					a showcase!For sharing, please try <a
 						href="http://tableaunoir.irisa.fr">http://tableaunoir.irisa.fr</a> instead.</div>
-				<div class="warning">Warning: this functionnality is still under development and may not work perfectly.
-				</div>
 				<div class="warning">Warning: The server will not save your board.
 				</div>
 
@@ -324,6 +322,15 @@
 				</div>
 
 				<div hidden id="shareInfo">
+
+					<h2>Users</h2>
+					<div id="userList"></div>
+
+					
+					<h2>Discussion</h2>
+					<button id="buttonAskQuestion" title="Ask a question because you do not understand the course">
+						<img class="icon" src="img/icons/say.svg" /></button>
+
 					<h2>Share with others</h2>
 					<div>
 						In order to <em>share</em> the board with your friends, give them the following URL:</div>
@@ -356,7 +363,8 @@
 
 					</div>
 
-					<div id="users"></div>
+
+					
 
 				</div>
 			</div>

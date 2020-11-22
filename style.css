@@ -501,7 +501,7 @@ h1 {
 	text-align: center;
 }
 
-#palette {
+.CircularMenu {
 	position: absolute;
 	z-index: 10000;
 	transition: 400ms;
@@ -510,7 +510,7 @@ h1 {
 
 
 
-.PaletteShow {
+.CircularMenuShow {
 	opacity: 1;
 	transform: rotate(0deg), scale(1);
 	visibility: visible;
@@ -518,7 +518,7 @@ h1 {
 }
 
 
-.PaletteHide {
+.CircularMenuHide {
 	opacity: 0;
 	transform: rotate(180deg) scale(10);
 	visibility: hidden;
@@ -700,3 +700,29 @@ h1 {
 	pointer-events: none;
 	color: grey;
 }
+
+
+#loading {
+	z-index: 10000;
+	padding: 96px;
+	background-repeat: repeat;
+	text-align: center;
+	vertical-align: middle;
+	left: 0px;
+	top: 0px;
+	font-size: 24px;
+	color: white;
+	position: absolute;
+}
+
+@keyframes loadingAnimation  {
+	from {
+		top: 0px;
+	}
+
+	to {
+		top: -100%;
+	}
+}
+
+

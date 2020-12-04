@@ -47,7 +47,7 @@ canvas {
 	position: absolute;
 	margin: 0px;
 	padding: 0px;
-	
+
 }
 
 
@@ -710,7 +710,7 @@ h1 {
 }
 
 
-@keyframes divideLineHelp  {
+@keyframes divideLineHelp {
 	from {
 		height: 0px;
 	}
@@ -749,45 +749,52 @@ h1 {
 	position: absolute;
 }
 
-@keyframes loadingAnimation  {
-	from {
-		top: 0px;
-	}
-
-	to {
-		top: -100%;
-	}
-}
 
 
 #backgroundSnapshot {
 	position: relative;
-	overflow: hidden;
-	height: 128px;
-	width: 192px;
+	height: 152px;
+	width: 236px;
+	margin: 16px;
 }
+
+
 
 
 #backgroundSnapshotBackgroundColor {
 	position: relative;
 	width: 192px;
 	height: 128px;
+	border: black 1px solid;
 }
 
-#backgroundSnapshotBackgroundImage {
+
+
+
+#backgroundSnapshotBackgroundImageDiv {
 	position: absolute;
 	height: 128px;
-	left:0px;
+	width: 192px;
+	overflow: hidden;
+	left: 0px;
 	top: 0px;
-	filter: contrast(0.5);
+	border: gray 1px solid;
 }
+
+
+#backgroundSnapshotBackgroundImage {
+	height: 128px;
+}
+
+
 
 #backgroundSnapshotCanvas {
 	position: absolute;
 	width: 192px;
 	height: 128px;
-	left:0px;
+	left: 0px;
 	top: 0px;
+	border: gray 1px solid;
 }
 
 
@@ -808,4 +815,3 @@ h1 {
 .handleRadius {
 	background-image: url(img/radius.svg);
 }
-

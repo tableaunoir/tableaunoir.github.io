@@ -521,10 +521,6 @@ img.magnet.backgroundTransparent {
 	background-color: rgb(51, 51, 51);
 }
 
-.selected {
-	background: rgb(51, 51, 51);
-	color: white;
-}
 
 .tabcontent {
 	padding: 8px;
@@ -1065,14 +1061,14 @@ h1 {
 
 .action {
 	position: relative;
-	width: 8px;
-	height: 24px;
+	width: 16px;
+	height: 16px;
 	background-color: rgb(128, 64, 64);
 	border: 1px solid rgb(64, 64, 64);
 	display: inline-block;
 	opacity: 0.7;
 	margin: 0px;
-	background-size: 8px 24px;
+	background-size: 16px 16px;
 }
 
 
@@ -1104,104 +1100,60 @@ h1 {
 
 }
 
-.actionDrag {
-	border-right: 4px solid green;
-	margin-right: 6px;
-}
 
 .slide {
 	display: inline-block;
-	height: 34px;
+	height: 8px;
+	width: 32px;
 	box-sizing: content-box;
+	background-color: grey;
+	border-bottom: 2px solid rgba(32, 32, 32, 0.8);
+	border-top: 2px solid rgba(32, 32, 32, 0.8);
+	border-left: 2px solid rgba(32, 32, 32, 0.8);
+	border-right: 2px solid rgba(32, 32, 32, 0.8);
+	flex-grow: 1;
+	cursor: pointer;
+}
+
+
+.slideCurrent {
+	border-left: 2px solid red;
+}
+
+
+
+
+.slide:hover {
+	border-bottom: 0px solid rgba(32, 32, 32, 0.8);
+	border-top: 0px solid rgba(32, 32, 32, 0.8);
+	height: 12px;
 }
 
 .toggleFold {
 	display: none;
 }
 
-.slide.folded>.action:not(:first-child):not(:last-child) {
-	position: absolute;
-	width: 0px;
-	height: 0px;
-	transition: width 500ms, transform 350ms;
-}
-
-/*
-no matter what, the last action in a slide is "big" (24px)
-*/
-.slide>.action:last-child {
-	width: 24px;
-	background-size: 24px 24px;
-}
-
-/*
-actions in between are not big
-*/
-.slide:not(.folded)>.action:not(:first-child):not(:last-child) {
-	width: 8px;
-	height: 24px;
-	transition: width 500ms, transform 350ms;
-}
-
-
-.slide:not(.folded)>.action:not(:first-child):not(:last-child):hover {
-	width: 24px;
-	height: 24px;
-	background-size: 24px 24px;
-	transition: width 500ms, transform 350ms;
-}
-
-
-/*
-the button for unfolding/folding a slide
-*/
-.slide>:first-child {
-	position: relative;
-	height: 20px;
-	width: 20px;
-	background-size: contain;
-	background-repeat: no-repeat;
-	background-position: center;
-	box-sizing: border-box;
-	border-radius: 15px 0px 0px 15px;
-	display: inline-block;
-	margin-left: 5px;
-	margin-right: 2px;
-	top: 50%;
-	transform: translateY(-100%);
-	cursor: pointer;
-	transition: width 500ms;
-	background-color: rgb(108, 108, 255);
-}
-
-.slide.folded>:first-child {
-	background-image: url(img/open.png);
-}
-
-.slide:not(.folded)>:first-child {
-	background-image: url(img/close.png);
-}
-
-
-.slide>:first-child:hover {
-	width: 30px;
-	transition: width 500ms;
-}
-
 
 .action:hover {
-	width: 24px;
-	background-size: 24px 24px;
+	transform: scale(1.1);
+}
+
+
+#timeline {
+	display: flex;
+}
+
+#animationToolBar {
+	display: block;
 }
 
 
 
 
-
-
-
-
-
+.dragover {
+	border-right: 4px solid rgb(0, 255, 0);
+	margin-right: 6px;
+}
 
 
 
@@ -1282,8 +1234,35 @@ the button for unfolding/folding a slide
 }
 
 
+.timelinecontrols {
+	display: flex;
+}
+
+#timelineSlideActionsWrapper {
+	display: inline-block;
+	overflow: auto;
+	flex-grow: 1;
+	height: 40px;
+	margin: 4px;
+}
+
+
+
+#timelineSlideActions {
+	display: inline;
+}
+
 
 
 .shake {
 	animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+
+.selected {
+	border: 2px solid rgb(0, 195, 255);
+}
+
+.selected:hover {
+	border: 2px solid rgb(0, 195, 255);
 }
